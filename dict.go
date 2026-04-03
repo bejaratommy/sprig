@@ -1,6 +1,9 @@
 package sprig
 
 import (
+	"fmt"
+	"reflect"
+
 	"dario.cat/mergo"
 	"github.com/mitchellh/copystructure"
 )
@@ -22,9 +25,19 @@ func unset(d map[string]interface{}, key string) map[string]interface{} {
 	return d
 }
 
-func hasKey(d map[string]interface{}, key string) bool {
-	_, ok := d[key]
-	return ok
+func hasKey(d interface{}, key string) bool {
+	v := reflect.ValueOf(d)
+	if v.Kind() == reflect.Map {
+		if v.Type().Key().Kind() != reflect.String {
+			return false
+		}
+		return v.MapIndex(reflect.ValueOf(key)).IsValid()
+	}
+	if m, ok := d.(map[string]interface{}); ok {
+		_, found := m[key]
+		return found
+	}
+	return false
 }
 
 func pluck(key string, d ...map[string]interface{}) []interface{} {
@@ -37,37 +50,57 @@ func pluck(key string, d ...map[string]interface{}) []interface{} {
 	return res
 }
 
-func keys(dicts ...map[string]interface{}) []string {
+func keys(dicts ...interface{}) []string {
 	k := []string{}
-	for _, dict := range dicts {
-		for key := range dict {
-			k = append(k, key)
+	for _, dictIface := range dicts {
+		v := reflect.ValueOf(dictIface)
+		if v.Kind() == reflect.Map {
+			if v.Type().Key().Kind() != reflect.String {
+				panic(fmt.Sprintf("keys: map key type must be string, got %s", v.Type().Key().Kind()))
+			}
+			for _, key := range v.MapKeys() {
+				k = append(k, key.String())
+			}
 		}
 	}
 	return k
 }
 
-func pick(dict map[string]interface{}, keys ...string) map[string]interface{} {
+func pick(dictIface interface{}, keys ...string) map[string]interface{} {
 	res := map[string]interface{}{}
-	for _, k := range keys {
-		if v, ok := dict[k]; ok {
-			res[k] = v
+	v := reflect.ValueOf(dictIface)
+	if v.Kind() == reflect.Map {
+		if v.Type().Key().Kind() != reflect.String {
+			panic(fmt.Sprintf("pick: map key type must be string, got %s", v.Type().Key().Kind()))
+		}
+		for _, k := range keys {
+			val := v.MapIndex(reflect.ValueOf(k))
+			if val.IsValid() {
+				res[k] = val.Interface()
+			}
 		}
 	}
 	return res
 }
 
-func omit(dict map[string]interface{}, keys ...string) map[string]interface{} {
+func omit(dictIface interface{}, keys ...string) map[string]interface{} {
 	res := map[string]interface{}{}
 
-	omit := make(map[string]bool, len(keys))
+	omitSet := make(map[string]bool, len(keys))
 	for _, k := range keys {
-		omit[k] = true
+		omitSet[k] = true
 	}
 
-	for k, v := range dict {
-		if _, ok := omit[k]; !ok {
-			res[k] = v
+	v := reflect.ValueOf(dictIface)
+	if v.Kind() == reflect.Map {
+		if v.Type().Key().Kind() != reflect.String {
+			panic(fmt.Sprintf("omit: map key type must be string, got %s", v.Type().Key().Kind()))
+		}
+		for _, key := range v.MapKeys() {
+			k := key.String()
+			if !omitSet[k] {
+				res[k] = v.MapIndex(key).Interface()
+			}
 		}
 	}
 	return res
@@ -125,13 +158,15 @@ func mustMergeOverwrite(dst map[string]interface{}, srcs ...map[string]interface
 	return dst, nil
 }
 
-func values(dict map[string]interface{}) []interface{} {
-	values := []interface{}{}
-	for _, value := range dict {
-		values = append(values, value)
+func values(dictIface interface{}) []interface{} {
+	vals := []interface{}{}
+	v := reflect.ValueOf(dictIface)
+	if v.Kind() == reflect.Map {
+		for _, key := range v.MapKeys() {
+			vals = append(vals, v.MapIndex(key).Interface())
+		}
 	}
-
-	return values
+	return vals
 }
 
 func deepCopy(i interface{}) interface{} {

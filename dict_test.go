@@ -308,3 +308,56 @@ func TestDig(t *testing.T) {
 		}
 	}
 }
+
+// TestKeysGenericMapTypes verifies that keys works with map types other than
+// map[string]interface{}, fixing https://github.com/Masterminds/sprig/issues/455.
+func TestKeysGenericMapTypes(t *testing.T) {
+	m := map[string]string{"foo": "a", "bar": "b"}
+	if err := runtv(`{{ keys . | sortAlpha }}`, "[bar foo]", m); err != nil {
+		t.Error(err)
+	}
+
+	m2 := map[string]int{"one": 1, "two": 2}
+	if err := runtv(`{{ keys . | sortAlpha }}`, "[one two]", m2); err != nil {
+		t.Error(err)
+	}
+}
+
+// TestValuesGenericMapTypes verifies that values works with map types other than
+// map[string]interface{}, fixing https://github.com/Masterminds/sprig/issues/455.
+func TestValuesGenericMapTypes(t *testing.T) {
+	m := map[string]string{"a": "x", "b": "y"}
+	if err := runtv(`{{ values . | sortAlpha }}`, "[x y]", m); err != nil {
+		t.Error(err)
+	}
+}
+
+// TestHasKeyGenericMapTypes verifies that hasKey works with map types other than
+// map[string]interface{}, fixing https://github.com/Masterminds/sprig/issues/455.
+func TestHasKeyGenericMapTypes(t *testing.T) {
+	m := map[string]string{"foo": "bar"}
+	if err := runtv(`{{ if hasKey . "foo" }}yes{{ end }}`, "yes", m); err != nil {
+		t.Error(err)
+	}
+	if err := runtv(`{{ if hasKey . "missing" }}yes{{ else }}no{{ end }}`, "no", m); err != nil {
+		t.Error(err)
+	}
+}
+
+// TestPickGenericMapTypes verifies that pick works with map types other than
+// map[string]interface{}, fixing https://github.com/Masterminds/sprig/issues/455.
+func TestPickGenericMapTypes(t *testing.T) {
+	m := map[string]string{"one": "a", "two": "b", "three": "c"}
+	if err := runtv(`{{ pick . "one" "two" | len }}`, "2", m); err != nil {
+		t.Error(err)
+	}
+}
+
+// TestOmitGenericMapTypes verifies that omit works with map types other than
+// map[string]interface{}, fixing https://github.com/Masterminds/sprig/issues/455.
+func TestOmitGenericMapTypes(t *testing.T) {
+	m := map[string]string{"one": "a", "two": "b", "three": "c"}
+	if err := runtv(`{{ omit . "one" | len }}`, "2", m); err != nil {
+		t.Error(err)
+	}
+}
