@@ -24,7 +24,18 @@ Perform integer division with `div`
 
 ## mod
 
-Modulo with `mod`
+Perform integer modulo with `mod`. The first argument is the dividend and the
+second is the divisor.
+
+`mod 10 3` returns `1` (10 % 3).
+
+When used in a pipeline, the piped value becomes the divisor:
+
+```
+{{ 3 | mod 10 }}
+```
+
+The above returns `1` (10 % 3).
 
 ## mul
 

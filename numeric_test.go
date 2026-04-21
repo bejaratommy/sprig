@@ -249,6 +249,29 @@ func TestDivf(t *testing.T) {
 	}
 }
 
+func TestMod(t *testing.T) {
+	// mod x y computes x % y (x is the dividend, y is the divisor)
+	tpl := `{{ mod 10 3 }}`
+	if err := runt(tpl, `1`); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestModPiped(t *testing.T) {
+	// Piping: {{ y | mod x }} computes x % y
+	tpl := `{{ 3 | mod 10 }}`
+	if err := runt(tpl, `1`); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestModEven(t *testing.T) {
+	tpl := `{{ mod 9 3 }}`
+	if err := runt(tpl, `0`); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestMul(t *testing.T) {
 	tpl := `{{ 1 | mul "2" 3 "4"}}`
 	if err := runt(tpl, `24`); err != nil {
