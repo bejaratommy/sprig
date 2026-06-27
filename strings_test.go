@@ -146,6 +146,16 @@ func TestToString(t *testing.T) {
 	}
 }
 
+func TestToStringPointer(t *testing.T) {
+	// A *string should be dereferenced rather than rendered as its address.
+	s := "hello"
+	assert.NoError(t, runtv(`{{ toString .Value }}`, "hello", map[string]interface{}{"Value": &s}))
+
+	// A nil *string renders as the empty string.
+	var n *string
+	assert.NoError(t, runtv(`{{ toString .Value }}`, "", map[string]interface{}{"Value": n}))
+}
+
 func TestToStrings(t *testing.T) {
 	tpl := `{{ $s := list 1 2 3 | toStrings }}{{ index $s 1 | kindOf }}`
 	assert.NoError(t, runt(tpl, "string"))
