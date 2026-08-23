@@ -33,6 +33,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/spf13/cast"
 	bcrypt_lib "golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/scrypt"
 )
@@ -134,10 +135,15 @@ var templateCharacters = map[byte]string{
 	'x': "AEIOUaeiouBCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz0123456789!@#$%^&*()",
 }
 
-func derivePassword(counter uint32, passwordType, password, user, site string) string {
+func derivePassword(counter interface{}, passwordType, password, user, site string) string {
 	var templates = passwordTypeTemplates[passwordType]
 	if templates == nil {
 		return fmt.Sprintf("cannot find password template %s", passwordType)
+	}
+
+	counterVal, err := cast.ToUint32E(counter)
+	if err != nil {
+		return fmt.Sprintf("cannot convert counter %v to uint32: %s", counter, err)
 	}
 
 	var buffer bytes.Buffer
@@ -154,7 +160,7 @@ func derivePassword(counter uint32, passwordType, password, user, site string) s
 	buffer.Truncate(len(masterPasswordSeed))
 	binary.Write(&buffer, binary.BigEndian, uint32(len(site)))
 	buffer.WriteString(site)
-	binary.Write(&buffer, binary.BigEndian, counter)
+	binary.Write(&buffer, binary.BigEndian, counterVal)
 
 	var hmacv = hmac.New(sha256.New, key)
 	hmacv.Write(buffer.Bytes())
