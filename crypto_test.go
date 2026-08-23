@@ -124,6 +124,27 @@ func TestDerivePassword(t *testing.T) {
 	}
 }
 
+func TestDerivePasswordCounterTypes(t *testing.T) {
+	// The counter argument must accept any value convertible to uint32 (not
+	// just literal uint32), since callers commonly pass in ints (e.g. from a
+	// range index) or strings (e.g. from atoi'd input).
+	expectations := map[string]string{
+		`{{derivePassword 1 "long" "password" "user" "example.com"}}`:         "ZedaFaxcZaso9*",
+		`{{derivePassword "1" "long" "password" "user" "example.com"}}`:       "ZedaFaxcZaso9*",
+		`{{derivePassword (int64 1) "long" "password" "user" "example.com"}}`: "ZedaFaxcZaso9*",
+	}
+
+	for tpl, result := range expectations {
+		out, err := runRaw(tpl, nil)
+		if err != nil {
+			t.Error(err)
+		}
+		if 0 != strings.Compare(out, result) {
+			t.Error("Generated password does not match for", tpl)
+		}
+	}
+}
+
 // NOTE(bacongobbler): this test is really _slow_ because of how long it takes to compute
 // and generate a new crypto key.
 func TestGenPrivateKey(t *testing.T) {
