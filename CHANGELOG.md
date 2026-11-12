@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- #397: Return dictionaries from `split` and `splitn` that work with `get`, `hasKey`,
+  and other dictionary functions. The map type is now `map[string]interface{}`
+  instead of `map[string]string`; keys and string values are unchanged.
+
 ## Release 3.3.0 (2024-08-29)
 
 ### Added

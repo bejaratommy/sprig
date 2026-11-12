@@ -130,6 +130,23 @@ func TestSplitn(t *testing.T) {
 	}
 }
 
+func TestSplitDictFunctions(t *testing.T) {
+	tests := map[string]string{
+		`{{$v := split "$" "foo$bar$baz"}}{{get $v "_0"}}`:         "foo",
+		`{{$v := split "$" "foo$bar$baz"}}{{hasKey $v "_1"}}`:      "true",
+		`{{$v := split "$" "foo$bar$baz"}}{{get $v "_2"}}`:         "baz",
+		`{{$v := splitn "$" 2 "foo$bar$baz"}}{{hasKey $v "_1"}}`:   "true",
+		`{{$v := splitn "$" 2 "foo$bar$baz"}}{{get $v "_1"}}`:      "bar$baz",
+		`{{$v := splitn "$" 0 "foo$bar$baz"}}{{hasKey $v "_0"}}`:   "false",
+		`{{$v := split "$" ""}}{{hasKey $v "_0"}}:{{get $v "_0"}}`: "true:",
+	}
+	for tpl, expected := range tests {
+		if err := runt(tpl, expected); err != nil {
+			t.Error(err)
+		}
+	}
+}
+
 func TestToString(t *testing.T) {
 	tests := []interface{}{
 		1,

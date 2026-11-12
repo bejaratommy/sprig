@@ -46,6 +46,16 @@ $a._0
 
 The above produces `foo`
 
+The result is a `dict` (`map[string]interface{}`), so it also works with dictionary
+functions such as `get` and `hasKey`:
+
+```
+get $a "_0"
+hasKey $a "_1"
+```
+
+These produce `foo` and `true`, respectively.
+
 ## splitn
 
 `splitn` function splits a string into a `dict`. It is designed to make
@@ -62,6 +72,16 @@ $a._0
 ```
 
 The above produces `foo`
+
+The result is a `dict` (`map[string]interface{}`), so it also works with dictionary
+functions such as `get` and `hasKey`:
+
+```
+get $a "_0"
+hasKey $a "_1"
+```
+
+These produce `foo` and `true`, respectively.
 
 ## sortAlpha
 
