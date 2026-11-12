@@ -200,18 +200,18 @@ func join(sep string, v interface{}) string {
 	return strings.Join(strslice(v), sep)
 }
 
-func split(sep, orig string) map[string]string {
+func split(sep, orig string) map[string]interface{} {
 	parts := strings.Split(orig, sep)
-	res := make(map[string]string, len(parts))
+	res := make(map[string]interface{}, len(parts))
 	for i, v := range parts {
 		res["_"+strconv.Itoa(i)] = v
 	}
 	return res
 }
 
-func splitn(sep string, n int, orig string) map[string]string {
+func splitn(sep string, n int, orig string) map[string]interface{} {
 	parts := strings.SplitN(orig, sep, n)
-	res := make(map[string]string, len(parts))
+	res := make(map[string]interface{}, len(parts))
 	for i, v := range parts {
 		res["_"+strconv.Itoa(i)] = v
 	}
