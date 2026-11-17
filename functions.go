@@ -335,8 +335,15 @@ var genericMap = map[string]interface{}{
 	"mustSlice":   mustSlice,
 	"concat":      concat,
 	"dig":         dig,
-	"chunk":       chunk,
-	"mustChunk":   mustChunk,
+	"digFromDict": func(dict map[string]interface{}, d interface{}, keys interface{}) (interface{}, error) {
+		ks := strslice(keys)
+		if len(ks) == 0 {
+			return nil, errors.New("digFromDict needs at least one key")
+		}
+		return digFromDict(dict, d, ks)
+	},
+	"chunk":     chunk,
+	"mustChunk": mustChunk,
 
 	// Crypto:
 	"bcrypt":                   bcrypt,

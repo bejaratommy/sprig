@@ -88,6 +88,27 @@ inserted.
 A common idiom in Sprig templates is to uses `pluck... | first` to get the first
 matching key out of a collection of dictionaries.
 
+## digFromDict
+
+`digFromDict` traverses a nested dictionary like `dig`, but accepts the keys as a
+list instead of separate arguments. This allows helpers to receive the lookup
+path as a parameter:
+
+```
+digFromDict $dict "guest" (list "user" "role" "humanName")
+```
+
+The arguments are the dictionary, the default value, and the list of keys.
+If any key is missing, the default value is returned. Keys are converted to
+strings, and the list must contain at least one key. As with `dig`, intermediate
+values must be dictionaries.
+
+The key list can also be piped into the function:
+
+```
+list "user" "role" "humanName" | digFromDict $dict "guest"
+```
+
 ## dig
 
 The `dig` function traverses a nested set of dicts, selecting keys from a list

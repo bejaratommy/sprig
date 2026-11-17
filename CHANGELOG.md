@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- #368: Expose `digFromDict` to traverse dictionaries using a list of keys.
+
 ## Release 3.3.0 (2024-08-29)
 
 ### Added
