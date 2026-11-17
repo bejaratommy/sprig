@@ -308,3 +308,22 @@ func TestDig(t *testing.T) {
 		}
 	}
 }
+
+func TestDigFromDict(t *testing.T) {
+	tests := map[string]string{
+		`{{ digFromDict (dict "a" (dict "b" 1)) "missing" (list "a" "b") }}`: "1",
+		`{{ digFromDict (dict "a" (dict "b" 1)) "missing" (list "a" "z") }}`: "missing",
+		`{{ digFromDict (dict) "missing" (list "a" "b") }}`:                  "missing",
+		`{{ digFromDict (dict "a" false) "missing" (list "a") }}`:            "false",
+		`{{ list "a" "b" | digFromDict (dict "a" (dict "b" 1)) "missing" }}`: "1",
+	}
+	for tpl, expect := range tests {
+		assert.NoError(t, runt(tpl, expect))
+	}
+	out, err := runRaw(`{{ digFromDict (dict "a" 1) "missing" . }}`, []string{"a"})
+	assert.NoError(t, err)
+	assert.Equal(t, "1", out)
+
+	_, err = runRaw(`{{ digFromDict (dict) "missing" (list) }}`, nil)
+	assert.ErrorContains(t, err, "digFromDict needs at least one key")
+}
