@@ -309,7 +309,7 @@ better internationalization.
 
 ## snakecase
 
-Convert string from camelCase to snake_case.
+Convert a string from camel case (`firstName` or `FirstName`) to snake_case.
 
 ```
 snakecase "FirstName"
@@ -319,13 +319,20 @@ This above will produce `first_name`.
 
 ## camelcase
 
-Convert string from snake_case to CamelCase
+Convert a string from snake_case to upper camel case (PascalCase).
+Despite its name, `camelcase` capitalizes the first letter: `some_string` becomes
+`SomeString`, not `someString`.
 
 ```
 camelcase "http_server"
 ```
 
 This above will produce `HttpServer`.
+
+This follows [xstrings.ToPascalCase](https://pkg.go.dev/github.com/huandu/xstrings#ToPascalCase).
+Leading and trailing underscores are preserved, and consecutive underscores
+between words are reduced by one. For example, `_complex__case_` becomes
+`_Complex_Case_`.
 
 ## kebabcase
 
